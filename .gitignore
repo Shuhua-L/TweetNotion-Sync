@@ -1,0 +1,7 @@
+virenv/
+__pycache__
+
+.env
+.vscode
+
+ignore/
