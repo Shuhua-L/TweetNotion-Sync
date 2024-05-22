@@ -47,10 +47,11 @@ def process_tweets(content):
             post_url = f"https://twitter.com/{username}/status/{post_id}"
 
             # tweet content
-            tweet_text = tweet["note_text"] if "note_text" in tweet else tweet["text"]
-            tweet_text = tweet_text.replace("\n", " ")  # remove newline characters
-            pic_url_regex = r"( ?https:\/\/t\.co\/[\w\d]+)$"
-            tweet_text = re.sub(pic_url_regex, "", tweet_text)  # remove ending URL
+            tweet_text = (
+                tweet["note_tweet"]["text"] if "note_tweet" in tweet else tweet["text"]
+            )
+            pic_url_regex = r"(https:\/\/t\.co\/[\w\d]+)"
+            split_text = re.split(pic_url_regex, tweet_text)
 
             # Generate post title with OpenAI
             prompt = f"Please create a concise, 3-5 word phrase as a header for the following, strictly adhering to the 3-5 word limit: {tweet_text}"
@@ -65,7 +66,11 @@ def process_tweets(content):
                 for key in keys:
                     if medias[key]["type"] == "photo":
                         picture_urls.append(medias[key]["url"])
-                    if medias[key]["type"] == "video":
+                    if (
+                        medias[key]["type"] == "video"
+                        or medias[key]["type"] == "animated_gif"
+                    ):
+                        logging.info(f"Video found: {medias[key]} ")
                         preview_url = medias[key]["preview_image_url"]
                         video = sorted(
                             medias[key]["variants"],
@@ -85,6 +90,7 @@ def process_tweets(content):
                 post_title,
                 picture_urls,
                 video_urls,
+                split_text,
             )
 
     except json.decoder.JSONDecodeError:

@@ -30,10 +30,10 @@ def save_notion_page(
     post_id,
     post_url,
     author_name,
-    tweet_text,
     post_title,
     picture_urls,
     video_urls,
+    split_text,
 ):
     properties = {
         "Title": {"title": [{"text": {"content": post_title}}]},
@@ -44,19 +44,33 @@ def save_notion_page(
         "ID": {"number": int(post_id)},
     }
 
+    def map_text_to_blocks(text):
+        if text.startswith("https://"):
+            block = {
+                "type": "text",
+                "text": {
+                    "content": text,
+                    "link": {"url": text},
+                },
+            }
+        else:
+            block = {
+                "type": "text",
+                "text": {
+                    "content": text,
+                },
+            }
+
+        return block
+
+    text_blocks = [map_text_to_blocks(text) for text in split_text]
+
     children = [
         {
             "object": "block",
             "type": "paragraph",
             "paragraph": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": tweet_text,
-                        },
-                    }
-                ],
+                "rich_text": text_blocks,
                 "color": "purple_background",
             },
         }
