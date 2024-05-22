@@ -1,3 +1,4 @@
 python-dotenv
 notion-client
 openai
+send2trash

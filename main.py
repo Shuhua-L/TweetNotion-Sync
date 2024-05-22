@@ -2,6 +2,7 @@ import json
 import os
 import re
 import logging
+from send2trash import send2trash
 
 # local imports
 from notion import save_notion_page
@@ -81,7 +82,6 @@ def process_tweets(content):
                 post_id,
                 post_url,
                 author_name,
-                tweet_text,
                 post_title,
                 picture_urls,
                 video_urls,
@@ -106,6 +106,7 @@ if __name__ == "__main__":
         logging.info(f"Synced {synced_count} tweets successfully🎉")
         # delete the file after syncing
         try:
-            os.remove(os.path.join(folder, file))
+            send2trash(os.path.join(folder, file))
+            logging.info(f"Deleted {file} from {folder}")
         except OSError as e:
             logging.error(e)
